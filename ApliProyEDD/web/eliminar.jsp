@@ -27,32 +27,7 @@
       
   </script>
   
-   <script type="text/javascript">
-       
-    $(document).ready(function(){
-        $('#comid').click(function(){
-            SeleccionandoCombo(this,'id');
-           
-          
-          });
-          function SeleccionandoCombo(comid){
-            comid = document.getElementById(comid);
-            if(comid.options[comid.selectedIndex].value != ""){
-                comid.disabled = true;
-            $.ajax({
-                url:'Eliminar.do'
-                datatype:'json'
-                data:'session.getAttribute("txtjson")',
-                succes:function(resultado){
-                    
-                }
-            });
-        }
-          
-      );
  
-    
-  </script>
  
   
   
@@ -99,7 +74,7 @@ padding: 7px 9px;
 }
 </style>
       
-      <form class="form-eliminar" method="post" action="Eliminar">
+      <form class="form-eliminar" method="post" action="p">
           <h2 class="form-eliminar-heading">Eliminar Activos</h2>
           <br><br>
           

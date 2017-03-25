@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author Astrid Hernandez
  */
-public class Eliminar extends HttpServlet {
+public class p extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,7 +33,7 @@ public class Eliminar extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-        HttpSession session = request.getSession(true);
+             HttpSession session = request.getSession(true);
           String inputUsuario, inputContrasena,inputDepartamento,inputEmpresa;
          inputUsuario = (String)session.getAttribute("inputUsuario");
            inputDepartamento = (String)session.getAttribute("inputDepartamento");
@@ -52,8 +52,8 @@ public class Eliminar extends HttpServlet {
           session.setAttribute("txtjson",devolver);
             System.out.println("c"+devolver);
           response.sendRedirect("eliminar.jsp");
- 
-      
+          Json json = new Json();
+          json.metodo();
         }
     }
 
