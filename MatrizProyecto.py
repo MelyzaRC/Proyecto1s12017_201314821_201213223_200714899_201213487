@@ -121,7 +121,11 @@ class Matriz:
 											if encontrado == False:
 												if (str(temp3.contenido.nombreUsuario) == str(user)) & (str(password) == str(temp3.contenido.passwordUsuario)):
 													encontrado = True
-													respuesta = self.ubicarNodo(temp3, activoActual)
+													if temp3.raiz == None:
+														temp3.raiz = activoActual
+														respuesta = "Raiz"
+													else:
+														respuesta = self.ubicarNodo(temp3.raiz, activoActual)
 											temp3 = temp3.atras
 										break
 								temp2 = temp2.anterior
@@ -135,16 +139,20 @@ class Matriz:
 		return respuesta
 
 
-	def ubicarNodo(self, raizGeneralT, activoInsertar):
+	def ubicarNodo(self, raiz, activoInsertar):
 		s = ""
-		if raizGeneralT.raiz == None:
-			raizGeneralT.raiz = activoInsertar
-			s = "Se ha isertado la raíz"
-		else:
-			if raizGeneralT.raiz.idActivo < activoInsertar.idActivo:
-				s = "Se insertaría en derecha"
+		if raiz.idActivo < activoInsertar.idActivo:
+			if raiz.hijoderecho == None:
+				raiz.hijoderecho = activoInsertar
+				s = "Insertado a la derecha"
 			else:
-				s = "Se insertaría en izquierda"
+				s = self.ubicarNodo(raiz.hijoderecho, activoInsertar)
+		else:
+			if raiz.hijoizquierdo == None:
+				raiz.hijoizquierdo= activoInsertar
+				s = "Insertado a la izquierda"
+			else:
+				s = self.ubicarNodo(raiz.hijoizquierdo, activoInsertar)
 
 		return s 
 	
