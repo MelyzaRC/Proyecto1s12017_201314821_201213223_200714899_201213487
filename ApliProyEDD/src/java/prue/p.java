@@ -53,7 +53,7 @@ public class p extends HttpServlet {
             System.out.println("c"+devolver);
           response.sendRedirect("eliminar.jsp");
           Json json = new Json();
-          json.metodo();
+          json.metodo((String) session.getAttribute("txtjson"));
         }
     }
 
