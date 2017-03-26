@@ -11,10 +11,14 @@ package prue;
  */
 public class Activo {
     
-    String descripcion;
+      String descripcion;
     String id;
-    String nombre;
+        String nombre;
     String estado;
+
+
+
+    
     
     public Activo(){
         descripcion = null;
@@ -29,5 +33,36 @@ public class Activo {
         nombre = nombre1;
         estado = estado1;
     }
-    
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
 }

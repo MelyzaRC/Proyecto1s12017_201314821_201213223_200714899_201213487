@@ -54,6 +54,8 @@ public class p extends HttpServlet {
           response.sendRedirect("eliminar.jsp");
           Json json = new Json();
           json.metodo((String) session.getAttribute("txtjson"));
+           
+           
         }
     }
 
