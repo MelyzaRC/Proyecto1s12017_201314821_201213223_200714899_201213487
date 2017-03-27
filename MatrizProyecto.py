@@ -372,7 +372,7 @@ class Matriz:
 												s = s + "\nDevolver objetos: ------------------------"
 												s = s + "\n" + self.devolverObjetos()
 												s = s + "\nDevolver objetos del actual: -------------"
-												s = s  + "\n" + self.devolverObjetosActual()
+												s = self.devolverObjetosActual()
 												self.listaUsuario.primero = None
 												self.listaUsuario.ultimo = None
 										tempBusquedaUsuario = tempBusquedaUsuario.atras
@@ -982,6 +982,10 @@ class Matriz:
 		a = ""
 		a = self.devolucion(raiz, ida)
 		return a
+	def metodoRandom(self, idRandom):
+		return "Este es un metodo random"
+
+
 
 m = Matriz()
 
@@ -1051,5 +1055,6 @@ def devolucion():
 	idTemp= str(request.form['id'])
 	s = m.devolucion(idTemp)
 	return s
+	
 if __name__ == "__main__":
   app.run(debug=True, host='localhost')
