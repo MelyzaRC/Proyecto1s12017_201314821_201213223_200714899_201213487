@@ -7,11 +7,6 @@ app = Flask("Proyecto 1 Estructura de Datos")
 import subprocess
 from graphviz import Digraph
 
-#Notas------------------------------------------------
-#Los metodos retornan valores "Ok" para decir que si realizó la acción y "No" para decir que no la realizó
-#Para devolver los activos pertenecientes a determinado usuario los devuelve en objetos json asi como los que aparecerán en el catalogo
-
-#Constructores de objetos------------------------------
 class Empresa:
 	def __init__(self, nombreEmpresa):
 		self.nombreEmpresa = nombreEmpresa
@@ -61,7 +56,18 @@ class ActivoCatalogo:
 		self.primero = primero
 		self.ultimo = ultimo
 
-#Matriz Dispersa--------------------------------------
+class Transaccion:
+	def __init__(self, idA, usuario, departamento, empresa, tiempo, primero, ultimo):
+		self.idA = idA
+		self.usuario = usuario
+		self.departamento = departamento
+		self.empresa = empresa
+		self.tiempo = tiempo
+		self.primero = primero
+		self.ultimo = ultimo
+		self.siguiente = None
+		self.anterior = None
+
 class Matriz:
 	def __init__(self):
 		self.primerDepartamento = None
@@ -70,7 +76,7 @@ class Matriz:
 		self.ultimaEmpresa = None
 		self.listaUsuario = Nodo("Lista de acivos pertenecientes a un usuario", None, None, None)
 		self.catalogo = ActivoCatalogo("Catalogo de productos", None, None, None, None, None)
-		self.listaPendientes = Nodo("Transacciones", None, None, None)
+		self.transacciones = Transaccion("Transacciones", None, None, None, None, None, None)
 	def vacia(self): 
 		if self.primeraEmpresa == None:
 			return True
@@ -857,6 +863,125 @@ class Matriz:
 		if raiz.hijoderecho != None:
 			a = a + self.rDerechaCatalogo(raiz.hijoderecho, empresa, departamento, usuario)
 		return a
+	def renta(self, idRenta, usuario, empresa, departamento, tiempo):
+		s = ""
+		ok = False
+		temp = self.primeraEmpresa
+		while temp != None:
+			temp1 = temp.primero
+			while temp1 != None:
+				temp2 = temp1
+				while temp2 != None:
+					s = self.recRentas(temp2.raiz, idRenta)
+					ok = True
+					temp2 = temp2.atras
+				temp1 = temp1.abajo
+			temp = temp.siguiente
+
+		if ok == True:
+			tempTr = Transaccion(idRenta, usuario, departamento, empresa, tiempo, None, None)
+			if self.transacciones.primero == None:
+				self.transacciones.primero = tempTr
+				self.transacciones.ultimo = tempTr
+			else:
+				self.transacciones.ultimo.siguiente = tempTr
+				tempTr.anterior = self.transacciones.ultimo
+				self.transacciones.ultimo = tempTr
+		else:
+			s = "No encontrado"
+		return s
+	def devolverRentas(self):
+		s = ""
+		if self.transacciones.primero == None:
+			s = "Vacío"
+		else:
+			s = "{\n\"rentas\"\n:["
+			temp = self.transacciones.primero
+			while temp != None:
+				if temp == self.transacciones.ultimo:
+					s = s + "\n{\n\"id\":\"" + temp.idA + "\",\n"
+					s = s + "\"usuario\":\"" + temp.usuario + "\",\n"
+					s = s + "\"departamento\":\"" + temp.departamento + "\",\n"
+					s = s + "\"empresa\":\"" + temp.empresa + "\",\n"
+					s = s + "\"tiempo\":\"" + temp.tiempo + "\"\n}\n" 
+				else:
+					s = s + "\n{\n\"id\":\"" + temp.idA + "\",\n"
+					s = s + "\"usuario\":\"" + temp.usuario + "\",\n"
+					s = s + "\"departamento\":\"" + temp.departamento + "\",\n"
+					s = s + "\"empresa\":\"" + temp.empresa + "\",\n"
+					s = s + "\"tiempo\":\"" + temp.tiempo + "\"\n}," 
+				temp = temp.siguiente
+		s = s + "]\n}"
+		return s
+	def recRentas(self, raiz, idAc):
+		a = ""
+		if str(raiz.idActivo) == str(idAc):
+			raiz.estado = "N"
+		else:
+			if raiz.hijoizquierdo != None:
+				a = self.rIz(raiz.hijoizquierdo, idAc)
+			if raiz.hijoderecho != None:
+				a = self.rDe(raiz.hijoderecho, idAc)
+		return a
+	def rIz(self, raiz, idAc):
+		a = ""
+		a = self.recRentas(raiz, idAc)
+		return a
+	def rDe(self, raiz, idAc):
+		a = ""
+		a = self.recRentas(raiz, idAc)
+		return a
+	def devolucion(self, idAc):
+		s = ""
+		ok = False
+		temp = self.primeraEmpresa
+		while temp != None:
+			temp1 = temp.primero
+			while temp1 != None:
+				temp2 = temp1
+				while temp2 != None:
+					s = self.recDev(temp2.raiz, idAc)
+					ok = True
+					temp2 = temp2.atras
+				temp1 = temp1.abajo
+			temp = temp.siguiente
+		if ok == False:
+			s = "No encontrado"
+		else:
+			temp = self.transacciones.primero
+			while temp != None:
+				if str(temp.idA) == str(idAc):
+					if temp == self.transacciones.primero:
+						t1 = temp.siguiente
+						self.transacciones.primero = None
+						self.transacciones.primero = t1
+					elif temp == self.transacciones.ultimo:
+						t1 = self.transacciones.ultimo.anterior
+						self.transacciones.ultimo = None
+						self.transacciones.ultimo = t1
+					else:
+						temp.siguiente.anterior = temp.anterior
+						temp.anterior.siguiente = temp.siguiente
+				temp = temp.siguiente
+		return s
+	def recDev(self, raiz, idAc):
+		a = ""
+		if str(raiz.idActivo) == str(idAc):
+			raiz.estado = "D"
+		else:
+			if raiz.hijoizquierdo != None:
+				a = self.recDev(raiz.hijoizquierdo, idAc)
+			if raiz.hijoderecho != None:
+				a = self.recDev(raiz.hijoderecho, idAc)
+		return a
+	def devI(self, raiz, ida):
+		a = ""
+		a = self.devolucion(raiz, ida)
+		return a
+	def devD(self, id):
+		a = ""
+		a = self.devolucion(raiz, ida)
+		return a
 
 m = Matriz()
 
@@ -889,6 +1014,18 @@ def Login():
 	passTemp = str(request.form['password'])
 	return m.Login(userTemp, passTemp, empresaTemp, departamentoTemp)
 
+@app.route('/renta',methods=['POST']) 
+def Renta():
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	userTemp = str(request.form['user'])
+	idTemp = str(request.form['id'])
+	tiempoTemp = str(request.form['tiempo'])
+	s = ""
+	s = m.renta(idTemp, userTemp, empresaTemp, departamentoTemp, tiempoTemp)
+	s = s + m.devolverRentas()
+	return s
+
 @app.route('/graficarMatriz', methods=['POST'])
 def graficarMatriz():
 	v = m.graphMatriz()
@@ -906,6 +1043,13 @@ def vista():
 def catalogo():
 	s = ""
 	s = m.devolverCatalogo()
+	return s
+
+@app.route('/devolucion', methods=['POST'])
+def devolucion():
+	s = ""
+	idTemp= str(request.form['id'])
+	s = m.devolucion(idTemp)
 	return s
 if __name__ == "__main__":
   app.run(debug=True, host='localhost')
