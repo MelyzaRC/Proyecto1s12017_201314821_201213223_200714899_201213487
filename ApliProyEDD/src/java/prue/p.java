@@ -7,11 +7,16 @@ package prue;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  *
@@ -34,7 +39,8 @@ public class p extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
              HttpSession session = request.getSession(true);
-          String inputUsuario, inputContrasena,inputDepartamento,inputEmpresa;
+            List lista = new ArrayList();
+            String inputUsuario, inputContrasena,inputDepartamento,inputEmpresa;
          inputUsuario = (String)session.getAttribute("inputUsuario");
            inputDepartamento = (String)session.getAttribute("inputDepartamento");
              inputEmpresa = (String)session.getAttribute("inputEmpresa");
@@ -52,12 +58,68 @@ public class p extends HttpServlet {
           session.setAttribute("txtjson",devolver);
             System.out.println("c"+devolver);
           response.sendRedirect("eliminar.jsp");
-          Json json = new Json();
+          /*Json json = new Json();
           json.metodo((String) session.getAttribute("txtjson"));
+           */
+       
+/*  JSONParser parser = new JSONParser();
+          try{
+              Object obj = parser.parse((String)session.getAttribute("txtjson"));
+              JSONObject jsonObject =(JSONObject) obj;
+       
+             /* String id = (String) jsonObject.get("id");
+              System.out.println("i:"+id);
+              String nombre = (String) jsonObject.get("nombre");
+              System.out.println("n:"+nombre);
+            */
+              
+            
+         /*     JSONArray tag = (JSONArray) jsonObject.get("Activos");
+             for(int i=0; i<tag.size();i++){
+                 JSONObject tagi = (JSONObject) tag.get(i);
+                 String id = (String)tagi.get("id");
+                 
+                 String nombre = (String) tagi.get("nombre");
+                
+                 String descripcion = (String) tagi.get("descripcion");
+                 
+                 String estado = (String) tagi.get("estado");
+                
+                 System.out.println("id:"+id);
+                 System.out.println("nombre:"+nombre);
+                 System.out.println("descripcion:"+descripcion);
+                 System.out.println("estado:"+estado);
+                 
            
-           
+             lista.add(id);
+                 System.out.println("listaid:"+lista);
+                 
+                String deli = "[\\[\\],]+";
+             String[] idArray= lista.toString().split(deli);
+                  
+                  for (String idArray1 : idArray) {
+                      System.out.println(idArray1);
+                
+
+                    
+                   //   session.setAttribute("idArray1",idArray1);
+                  }
+                 
+            
+                 
+                  /* System.out.println("Activos");
+                  Iterator iterator = tag.iterator();
+                  while(iterator.hasNext()){
+                  System.out.println(iterator.next());
+                  Activo activo = new Activo();
+                  System.out.println("1"+activo.nombre);
+                  System.out.println("2"+activo.id);
+                   */
+                  
+                  
+          }
         }
-    }
+        
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
