@@ -1,3 +1,4 @@
+# coding=utf-8
 #Autor-------------------------------------------------
 __author__ = "Melyza Rodriguez - Grupo 4"
 
@@ -100,8 +101,9 @@ class Matriz:
 				s = self.addUsuario(empresa, departamento, nombre, user, password)
 		return s
 
-	def addNodoArbol(self, user, password, departamento, empresa, idA, nombrea, descripcion):
-		activoActual = Activo(idA, nombrea, descripcion, "D")#D para disponible N para no disponible 
+	def addActivo(self, user, password, departamento, empresa, nombrea, descripcion):
+		idActivo = self.asignarId()
+		activoActual = Activo(idActivo, nombrea, descripcion, "D")#D para disponible N para no disponible 
 		temp = self.primeraEmpresa
 		encontrado = False
 		s = ""
@@ -120,12 +122,15 @@ class Matriz:
 										while temp3 != None:
 											if encontrado == False:
 												if (str(temp3.contenido.nombreUsuario) == str(user)) & (str(password) == str(temp3.contenido.passwordUsuario)):
-													encontrado = True
 													if temp3.raiz == None:
 														temp3.raiz = activoActual
-														respuesta = "Raiz"
+														temp3.raiz.raiz = activoActual
+														s = self.verArbol(temp3.raiz)
+														encontrado = True
 													else:
-														respuesta = self.ubicarNodo(temp3.raiz, activoActual)
+														s = self.ubicarNodoArbol(temp3.raiz, activoActual)
+														s = self.verArbol(temp3.raiz)
+														encontrado = True
 											temp3 = temp3.atras
 										break
 								temp2 = temp2.anterior
@@ -135,27 +140,44 @@ class Matriz:
 					else:
 						break
 			temp = temp.siguiente
-		
+		if encontrado == True:
+			respuesta = "Ok" + "\n" + s
+			encontrado = False
+		else:
+			respuesta = "No"
+			if self.contadorId > 1000000:
+				self.contadorId = self.contadorId - 1
+			else:
+				self.contadorId = self.contadorId
 		return respuesta
 
-
-	def ubicarNodo(self, raiz, activoInsertar):
-		s = ""
-		if raiz.idActivo < activoInsertar.idActivo:
-			if raiz.hijoderecho == None:
-				raiz.hijoderecho = activoInsertar
-				s = "Insertado a la derecha"
+	def verArbol(self, raiz):
+		a = ""
+		temp = raiz
+		a = "Raiz: Id-->" + str(temp.idActivo) + " Descripcion: " + str(temp.descripcionActivo) + "\n*****     Subarboles     *****\n"
+		while temp != None:
+			if temp.hijoizquierdo == None:
+				break
 			else:
-				s = self.ubicarNodo(raiz.hijoderecho, activoInsertar)
+				a = a + "\nPadre: " + str(temp.nombreActivo) + " Id: " + str(temp.idActivo) + " Descripción: " +  str(temp.descripcionActivo)
+				if temp.hijoizquierdo != None:
+					a = a + "\nHijo izquierdo: " + str(temp.hijoizquierdo.nombreActivo) + " Id: " + str(temp.hijoizquierdo.idActivo) + " Descripción: " +  str(temp.hijoizquierdo.descripcionActivo)
+				if temp.hijoderecho != None:
+					a = a + "\nHijo derecho: " + str(temp.hijoderecho.nombreActivo) + " Id: " + str(temp.hijoderecho.idActivo) + " Descripcion: " + str(temp.hijoderecho.descripcionActivo)
+			temp = temp.hijoizquierdo
+		return a
+
+	def ubicarNodoArbol(self, raiz, activo):
+		a = ""
+		if raiz.hijoizquierdo == None:
+			raiz.hijoizquierdo = activo
+			a = "Agregado un nodo a la izquierda"
+		elif raiz.hijoderecho == None:
+			raiz.hijoderecho = activo
+			a = "Agregado un nodo a la derecha"
 		else:
-			if raiz.hijoizquierdo == None:
-				raiz.hijoizquierdo= activoInsertar
-				s = "Insertado a la izquierda"
-			else:
-				s = self.ubicarNodo(raiz.hijoizquierdo, activoInsertar)
-
-		return s 
-	
+			a = self.ubicarNodoArbol(raiz.hijoizquierdo, activo)
+		return a
 	
 	def addUsuario(self, empresa, departamento, nombre, user, password):
 		nuevaEmpresa = Empresa(empresa)
@@ -575,19 +597,135 @@ class Matriz:
 				s = "No"
 		return s
 
+	def asignarId(self):
+		idGenerado = ""
+		idGenerado = "eddactivo"+ str(self.contadorId)
+		self.contadorId = self.contadorId + 1
+		return idGenerado
+
+	def modificarActivo(self, user, password, departamento, empresa, idbuscar, descripcionNueva):
+		temp = self.primeraEmpresa
+		encontrado = False
+		s = ""
+		respuesta = ""
+		while temp != None:
+			if str(temp.contenido.nombreEmpresa) == str(empresa):
+				if encontrado == False:
+					temp1 = temp.primero
+					while temp1 != None:
+						if encontrado == False:
+							temp2 = temp1
+							while temp2 != None:
+								if temp2.anterior == None:
+									if str(temp2.contenido.nombreDepartamento) == str(departamento):
+										temp3 = temp1
+										while temp3 != None:
+											if encontrado == False:
+												if (str(temp3.contenido.nombreUsuario) == str(user)) & (str(password) == str(temp3.contenido.passwordUsuario)):
+													tempArbol = temp3.raiz
+													while tempArbol != None:
+														if str(tempArbol.idActivo) == str(idbuscar):
+															tempArbol.descripcionActivo = str(descripcionNueva)
+															encontrado = True
+															s = self.verArbol(temp3.raiz)
+															break
+														elif tempArbol.hijoizquierdo != None:
+															if str(tempArbol.hijoizquierdo.idActivo) == str(idbuscar):
+																tempArbol.hijoizquierdo.descripcionActivo = str(descripcionNueva)
+																encontrado = True
+																s = self.verArbol(temp3.raiz)
+																break
+														elif tempArbol.hijoderecho != None:
+															if str(tempArbol.hijoderecho.idActivo) == str(idbuscar):
+																tempArbol.hijoderecho.descripcionActivo = str(descripcionNueva)
+																encontrado = True
+																s = self.verArbol(temp3.raiz)
+																break
+														tempArbol = tempArbol.hijoizquierdo
+											temp3 = temp3.atras
+										break
+								temp2 = temp2.anterior
+						else:
+							break
+						temp1 = temp1.abajo
+					else:
+						break
+			temp = temp.siguiente
+		if encontrado == True:
+			respuesta = "Ok"
+		else:
+			respuesta = "No"
+		return respuesta + "\n" + s
+
+	def devolverElementos(self, user, password, departamento, empresa):
+		temp = self.primeraEmpresa
+		encontrado = False
+		respuesta = "{\n\"Activos\":[\n"
+		while temp != None:
+			if str(temp.contenido.nombreEmpresa) == str(empresa):
+				if encontrado == False:
+					temp1 = temp.primero
+					while temp1 != None:
+						if encontrado == False:
+							temp2 = temp1
+							while temp2 != None:
+								if temp2.anterior == None:
+									if str(temp2.contenido.nombreDepartamento) == str(departamento):
+										temp3 = temp1
+										while temp3 != None:
+											if encontrado == False:
+												if (str(temp3.contenido.nombreUsuario) == str(user)) & (str(password) == str(temp3.contenido.passwordUsuario)):
+													tempArbol = temp3.raiz
+													while tempArbol != None:
+														if tempArbol.hijoizquierdo != None:
+															respuesta = respuesta + "{\n\"id\":\"" +tempArbol.idActivo + "\",\n"
+															respuesta = respuesta + "\"nombre\":\"" +tempArbol.nombreActivo + "\",\n"
+															respuesta = respuesta + "\"descripcion\":\"" +tempArbol.descripcionActivo + "\",\n"
+															respuesta = respuesta + "\"estado\":\"" +tempArbol.estado + "\"\n},\n" 
+															if tempArbol.hijoderecho != None:
+																respuesta = respuesta + "{\n\"id\":\"" +tempArbol.hijoderecho.idActivo + "\",\n"
+																respuesta = respuesta + "\"nombre\":\"" +tempArbol.hijoderecho.nombreActivo + "\",\n"
+																respuesta = respuesta + "\"descripcion\":\"" +tempArbol.hijoderecho.descripcionActivo + "\",\n"
+																respuesta = respuesta + "\"estado\":\"" +tempArbol.hijoderecho.estado + "\"\n},\n" 
+														else:
+															respuesta = respuesta + "{\n\"id\":\"" +tempArbol.idActivo + "\",\n"
+															respuesta = respuesta + "\"nombre\":\"" +tempArbol.nombreActivo + "\",\n"
+															respuesta = respuesta + "\"descripcion\":\"" +tempArbol.descripcionActivo + "\",\n"
+															respuesta = respuesta + "\"estado\":\"" +tempArbol.estado + "\"\n}\n" 
+														tempArbol = tempArbol.hijoizquierdo
+													encontrado = True
+											temp3 = temp3.atras
+										break
+								temp2 = temp2.anterior
+						else:
+							break
+						temp1 = temp1.abajo
+					else:
+						break
+			temp = temp.siguiente
+		
+		return respuesta + "]\n}"
+
+	def graficarMatriz(self):
+		dot = Digraph(comment = 'GraficaMatrizDispersa')
+		dot
+		#Primero crear empresas con sus primeros 
+		temp = self.primeraEmpresa
+		while temp != None:
+			temp1 = temp.primero
+			while temp1.Primero != None:
+				if temp1 == temp.primero:
+					dot.node(temp.contenido.nombreEmpresa)
+					dot.node(temp1.nombreUsuario)
+					dot.edge(str(temp.contenido.nombreEmpresa),str(temp.primero.nombreUsuario))
+					dot.render('test-output/ListaSimple.dot', view=False)
+				temp1 = temp1.abajo
+			temp = temp.siguiente
+		return "Graficado"
+
 m = Matriz()
 
 #Metodos---------------------------------------------
-@app.route('/addActivo',methods=['POST']) 
-def addActivo():
-	empresaTemp= str(request.form['empresa'])
-	departamentoTemp = str(request.form['departamento'])
-	userTemp = str(request.form['user'])
-	passTemp = str(request.form['password'])
-	nombreActivoTemp = str(request.form['nombreActivo'])
-	descripcionActivoTemp = str(request.form['descripcionActivo'])
-	idActivoTemp = str(request.form['idActivo'])
-	return m.addNodoArbol(userTemp, passTemp, departamentoTemp, empresaTemp, idActivoTemp, nombreActivoTemp, descripcionActivoTemp)
 
 @app.route('/addMatrizDispersa',methods=['POST']) 
 def addMatrizDispersa():
@@ -606,6 +744,38 @@ def Login():
 	passTemp = str(request.form['password'])
 	return m.Login(userTemp, passTemp, empresaTemp, departamentoTemp, )
 
+@app.route('/addActivo',methods=['POST']) 
+def addActivo():
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	userTemp = str(request.form['user'])
+	passTemp = str(request.form['password'])
+	nombreActivoTemp = str(request.form['nombreActivo'])
+	descripcionActivoTemp = str(request.form['descripcionActivo'])
+	return m.addActivo(userTemp, passTemp, departamentoTemp, empresaTemp, nombreActivoTemp, descripcionActivoTemp)
+
+@app.route('/modificarActivo',methods=['POST']) 
+def modificarActivo():
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	userTemp = str(request.form['user'])
+	passTemp = str(request.form['password'])
+	idTemp = str(request.form['idActivo'])
+	descripcionActivoTemp = str(request.form['descripcionNueva'])
+	return m.modificarActivo(userTemp, passTemp, departamentoTemp, empresaTemp, idTemp, descripcionActivoTemp)
+
+@app.route('/devolverElementos',methods=['POST']) 
+def devolverElementos():
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	userTemp = str(request.form['user'])
+	passTemp = str(request.form['password'])
+	s = m.devolverElementos(userTemp, passTemp, departamentoTemp, empresaTemp)
+	return s 
+
+@app.route('/verMatriz', methods=['POST'])
+def verMatriz():
+	return m.graficarMatriz()
 
 if __name__ == "__main__":
   app.run(debug=True, host='localhost')

@@ -8,7 +8,9 @@ package prue;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
@@ -23,6 +25,7 @@ import org.json.simple.parser.ParseException;
  */
 public class Json {
     public void metodo(String texto) throws IOException{
+        List lista = new ArrayList();
   JSONParser parser = new JSONParser();
           try{
               Object obj = parser.parse(texto);
@@ -47,7 +50,7 @@ public class Json {
                  System.out.println("nombre:"+nombre);
                  System.out.println("descripcion:"+descripcion);
                  System.out.println("estado:"+estado);
-                 
+                 lista.add(id);
               /* System.out.println("Activos");
               Iterator iterator = tag.iterator();
               while(iterator.hasNext()){
