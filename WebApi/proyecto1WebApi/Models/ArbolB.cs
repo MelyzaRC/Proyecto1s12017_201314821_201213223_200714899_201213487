@@ -93,7 +93,7 @@ namespace proyecto1WebApi.Models
                         dividirNodo(ref actual, ref mediana, ref nuevo, k, ref mediana, ref nuevo);
                     else
                     {
-                        subeArriba = false;
+                        subeArriba = false; 
                         meterHoja(ref actual, ref mediana, ref nuevo, k);
                     }
                 }
@@ -122,8 +122,9 @@ namespace proyecto1WebApi.Models
             int i, claveMedia;
 
             claveMedia = (k <= this.orden / 2) ? this.orden / 2 : this.orden / 2 + 1;
+            if (nuevo==null)
+                nuevo = new Pagina(5);
 
-            nuevo = new Pagina(5);
             for (i = claveMedia + 1; i < this.orden; i++)
             {
 
@@ -221,7 +222,7 @@ namespace proyecto1WebApi.Models
             while (q.ramas[0] != null)
                 q = q.ramas[0];
             actual.claves[k] = q.claves[1];
-            q.claves[1] = null;
+            //q.claves[1] = null;
             actual.ramas[k] = q;
         }
 
@@ -331,22 +332,22 @@ namespace proyecto1WebApi.Models
         public string dibujaArbol(Pagina actual)
         {
             string res = "text: { name: '|";
-            
-            for(int i = 0; i < 5; i++)
+
+            for (int i = 0; i < 5; i++)
             {
                 res += actual.claves[i] == null ? " " : actual.claves[i].transactionID;
                 res += "|";
             }
             res += "'}";
             bool primero = true;
-            for(int j = 0; j < 5; j++)
+            for (int j = 0; j < 5; j++)
             {
                 if (actual.ramas[j] != null)
                 {
                     if (primero)
                     {
                         res += ",children: [ ";
-                        
+
                     }
 
                     res += "{";
@@ -355,13 +356,53 @@ namespace proyecto1WebApi.Models
 
                     res += "}";
 
-                    if (actual.ramas.Count()>(j+1) && actual.ramas[j + 1] != null)
+                    if (actual.ramas.Count() > (j + 1) && actual.ramas[j + 1] != null)
                         res += ",";
                 }
             }
             if (!primero)
-                res+="]";
+                res += "]";
 
+            return res;
+        }
+
+        public string graficarArbol(Pagina actual)
+        {
+            string res = "";
+            string claves = getClaves(actual);
+            
+            for (int j = 0; j < 5; j++)
+            {
+                if (actual.ramas[j] != null)
+                {
+                    string rama = getClaves(actual.ramas[j]);
+
+                    if (!string.IsNullOrEmpty(rama))
+                    {
+                        res += " " + claves + " -- " + rama + ";";
+                    }
+
+                    res += graficarArbol(actual.ramas[j]);
+                    
+                }
+            }
+
+            return res;
+        }
+
+        public string getClaves(Pagina pag)
+        {
+            if (pag.cuenta == 0)
+                return null;
+
+            string res = "\"|";
+
+            for (int i = 0; i < 5; i++)
+            {
+                res += pag.claves[i] == null ? " " : pag.claves[i].transactionID;
+                res += "|";
+            }
+            res += "\"";
             return res;
         }
 
@@ -373,6 +414,25 @@ namespace proyecto1WebApi.Models
         public bool nodoLLeno(Pagina actual)
         {
             return (actual.cuenta == this.orden - 1);
+        }
+
+
+        public void eliminarActivo (ref Pagina pag, string activo)
+        {
+            for(int i = 0; i < 5; i++)
+            {
+                if (pag.claves[i].assetID.Equals(activo))
+                {
+                    eliminar(ref pag, pag.claves[i]);
+                    Pagina p = ArbolB.raiz;
+                    eliminarActivo(ref p, activo);
+                    ArbolB.raiz = p;
+                }
+                if (pag.ramas[i] != null)
+                {
+                    eliminarActivo(ref pag.ramas[i], activo);
+                }
+            }
         }
 
     }

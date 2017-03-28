@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace proyecto1WebApi.Models
 {
-    public unsafe class Pagina
+    public class Pagina
     {
         public int orden { get; set; }
         public Pagina[] ramas { get; set; }

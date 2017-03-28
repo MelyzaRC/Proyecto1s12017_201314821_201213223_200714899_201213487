@@ -6,20 +6,20 @@ using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Web.Http;
+using System.IO;
+using System.Diagnostics;
 
 namespace proyecto1WebApi.Controllers
 {
     public class ArbolBController : ApiController
     {
         public static ArbolB arbol = new ArbolB(5);
-        public static List<string> transactions = new List<string>();
 
         [HttpGet]
         [ActionName("nuevoArbol")]
         public void nuevoArbol()
         {
             arbol = new ArbolB(5);
-            transactions = new List<string>();
         }
 
         [HttpGet]
@@ -33,6 +33,46 @@ namespace proyecto1WebApi.Controllers
             return javascript;
         }
 
+        [HttpGet]
+        [ActionName("graficarArbol")]
+        public string graficarArbol()
+        {
+            Pagina a = ArbolB.raiz;
+            string javascript = "graph {";
+            javascript += arbol.graficarArbol(a);
+            javascript += "}";
+
+            string filePath = AppDomain.CurrentDomain.BaseDirectory + "imagenes\\archivo_dot.dot";
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            using (StreamWriter sw = File.CreateText(filePath))
+            {
+                sw.WriteLine(javascript);
+            }
+
+            string parametros = "-Tjpg \"" + filePath + "\" > \"" + AppDomain.CurrentDomain.BaseDirectory + "imagenes\\arbol.jpg\"";
+            string comandoCMD = "\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot.exe\"";
+
+            ProcessStartInfo p = new ProcessStartInfo();
+            p.FileName = comandoCMD;
+            p.Arguments = parametros;
+            p.CreateNoWindow = true;
+            p.WindowStyle = ProcessWindowStyle.Hidden;
+
+            Process proc = new Process();
+
+            proc.StartInfo = p;
+
+            proc.Start();
+
+            string result = proc.StandardOutput.ReadToEnd();
+            
+
+            return javascript;
+        }
+
 
         [HttpGet]
         [ActionName("obtenerArbol")]
@@ -43,19 +83,19 @@ namespace proyecto1WebApi.Controllers
 
         [HttpGet]
         [ActionName("insertar")]
-        public void insertar([FromUri]string transactionID)//, [FromUri]string userID, [FromUri]string departamento, [FromUri]string assetID, [FromUri]string empresa, [FromUri]string fecha, [FromUri]string diasRentados)
+        public void insertar([FromUri]string userID, [FromUri]string departamento, [FromUri]string assetID, [FromUri]string empresa, [FromUri]string fecha, [FromUri]string diasRentados)
         {
-            transactions.Add(transactionID);
-            //+string transactionID = Guid.NewGuid().ToString("N").Substring(0, 15);
+            
+            string transactionID = Guid.NewGuid().ToString("N").Substring(0, 15);
             arbol.insertarNodo(new nodo
             {
-                transactionID = transactionID/*,
+                transactionID = transactionID,
                 assetID = assetID,
                 userID = userID,
                 empresa = empresa,
                 departamento = departamento,
                 fecha = fecha,
-                diasRentados = diasRentados*/
+                diasRentados = diasRentados
             });
         }
 
@@ -68,7 +108,19 @@ namespace proyecto1WebApi.Controllers
             arbol.eliminar(ref raiz, new nodo { transactionID = transactionID });
 
             ArbolB.raiz = raiz;
-            
+
+        }
+
+        [HttpGet]
+        [ActionName("eliminarActivo")]
+        public void eliminarActivo([FromUri]string assetID)
+        {
+            Pagina raiz = ArbolB.raiz;
+
+            arbol.eliminarActivo(ref raiz, assetID);
+
+            ArbolB.raiz = raiz;
+
         }
     }
 }
