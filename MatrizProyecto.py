@@ -996,6 +996,41 @@ class Matriz:
 		for x in range(15):
 			idRandom = idRandom + random.choice(letras)
 		return idRandom
+	def modificar(self, idAc, des):
+		s = ""
+		ok = False
+		temp = self.primeraEmpresa
+		while temp != None:
+			temp1 = temp.primero
+			while temp1 != None:
+				temp2 = temp1
+				while temp2 != None:
+					s = self.recMod(temp2.raiz, idAc, des)
+					ok = True
+					temp2 = temp2.atras
+				temp1 = temp1.abajo
+			temp = temp.siguiente
+		return s
+	def recMod(self, raiz, idAc, des):
+		a = "No"
+		if str(raiz.idActivo) == str(idAc):
+			if str(raiz.estado) == "D":
+				raiz.descripcionActivo = des
+				a = "Ok"
+		else:
+			if raiz.hijoizquierdo != None:
+				a = self.recModIz(raiz.hijoizquierdo, idAc, des)
+			if raiz.hijoderecho != None:
+				a = self.recModDe(raiz.hijoderecho, idAc, des)
+		return a
+	def recModIz(self, raiz, idAc, des):
+		a = ""
+		a = self.recMod(raiz, idAc, des)
+		return a
+	def recModDe(self, raiz, idAc, des):
+		a = ""
+		a = self.recMod(raiz, idAc, des)
+		return a
 
 
 
@@ -1071,6 +1106,14 @@ def devolucion():
 	s = ""
 	idTemp= str(request.form['id'])
 	s = m.devolucion(idTemp)
+	return s
+
+@app.route('/modificar', methods=['POST'])
+def modificar():
+	s = ""
+	idTemp= str(request.form['id'])
+	desTemp= str(request.form['descripcion'])
+	s = m.modificar(idTemp, desTemp)
 	return s
 	
 if __name__ == "__main__":
