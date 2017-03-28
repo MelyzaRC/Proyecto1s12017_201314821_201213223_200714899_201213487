@@ -70,6 +70,7 @@ class Transaccion:
 		self.anterior = None
 
 class Matriz:
+
 	def __init__(self):
 		self.primerDepartamento = None
 		self.ultimoDepartamento = None
@@ -293,7 +294,7 @@ class Matriz:
 					aux11 = aux11.siguiente
 				aux10 = aux10.abajo
 
-		dot.render('test-output/MatrizDispersa.dot', view=False)
+		dot.render('c:/graficas/MatrizDispersa.dot', view=False)
 		return "Graficado"
 	def recorrerArbol(self, raiz, a):#(Pre-Orden)
 		a = "Nodo:\nId: " + raiz.idActivo + "\nNombre: " + raiz.nombreActivo + "\nDescripción: " + raiz.descripcionActivo + "\nEstado: " + raiz.estado + "\n"
@@ -761,7 +762,7 @@ class Matriz:
 					temp3 = temp3.anterior
 				temp2 = temp2.abajo
 			temp = temp.siguiente
-		s = s + "\n************************************************************************************************" 
+		s = s + "\n******************************"
 		return s
 	def Login(self, usuario, password, empresa, departamento):
 		s = ""
@@ -1031,9 +1032,63 @@ class Matriz:
 		a = ""
 		a = self.recMod(raiz, idAc, des)
 		return a
+	def activosEmpresa(self, empresa):
+		s = ""
+		dot = Digraph(comment = 'GraficaLista')
+		dot
+		lista = Nodo("Lista de activos por empresa", None, None, None)
+		if self.primeraEmpresa != None:
+			temp = self.primeraEmpresa
+			while temp != None:
+				if str(empresa) == str(temp.contenido.nombreEmpresa):
+					temp1 = temp.primero
+					while temp1 != None:
+						temp2 = temp1
+						while temp2 != None:
+							s = self.addListaEmpresa(temp2.raiz, lista)
+							temp2 = temp2.atras
+						temp1 = temp1.abajo
+					break
+				temp = temp.siguiente
 
+		if lista.primero != None:
+			s = "Empresa: " + str(empresa) + "\n"
+			temp = lista.primero
+			while temp != None:
+				s = s + "\nId: " + temp.contenido.idActivo + " Nombre: " + temp.contenido.nombreActivo + " Estado: " + temp.contenido.estado
+				temp = temp.siguiente
+			temp = lista.primero
+			dot.node(str(temp.contenido.idActivo))
+			while temp.siguiente != None:
+				dot.node(str(temp.contenido.idActivo))
+				dot.node(str(temp.siguiente.contenido.idActivo))
+				dot.edge(str(temp.contenido.idActivo), str(temp.siguiente.contenido.idActivo))
+				temp = temp.siguiente
+			dot.render('c:/graficas/ActivosEmpresa.dot', view=False)
+		return s 
 
-
+	def addListaEmpresa(self, raiz, lista):
+		nodoLista = Nodo(raiz, None, None, None)
+		if lista.primero == None:
+			lista.primero = nodoLista
+			lista.ultimo = nodoLista
+		else:
+			lista.ultimo.siguiente = nodoLista
+			nodoLista.anterior = lista.ultimo
+			lista.ultimo = nodoLista
+		if raiz.hijoizquierdo != None:
+			self.addLI(raiz.hijoizquierdo, lista)
+		if raiz.hijoderecho != None:
+			self.addLD(raiz.hijoderecho, lista)
+		return ""
+	def addLI(self, raiz, lista):
+		s = ""
+		s = self.addListaEmpresa(raiz, lista)
+		return s
+	def addLD(self, raiz, lista):
+		s = ""
+		s = self.addListaEmpresa(raiz, lista)
+		return s 
 m = Matriz()
 
 #Metodos---------------------------------------------
@@ -1115,6 +1170,17 @@ def modificar():
 	desTemp= str(request.form['descripcion'])
 	s = m.modificar(idTemp, desTemp)
 	return s
+@app.route('/activosEmpresa', methods=['POST'])
+def activosEmpresa():
+	s = ""
+	empresaTemp= str(request.form['empresa'])
+	s = m.activosEmpresa(empresaTemp)
+	return s
+@app.route('/recorrerMatriz', methods=['POST'])
+def recorrerMatriz():
+	s = ""
+	s = m.recorrerMatriz()
+	return s 
 	
 if __name__ == "__main__":
   app.run(debug=True, host='localhost')
