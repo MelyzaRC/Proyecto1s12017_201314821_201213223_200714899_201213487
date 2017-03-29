@@ -92,10 +92,11 @@ namespace proyecto1WebApi.Controllers
 
         [HttpGet]
         [ActionName("insertar")]
-        public void insertar([FromUri]string userID, [FromUri]string departamento, [FromUri]string assetID, [FromUri]string empresa, [FromUri]string fecha, [FromUri]string diasRentados)
+        public void insertar([FromUri]string userID, [FromUri]string departamento, [FromUri]string assetID, [FromUri]string empresa, [FromUri]string diasRentados)
         {
 
             string transactionID = Guid.NewGuid().ToString("N").Substring(0, 15);
+            string fecha = DateTime.Now.ToShortDateString();
             arbol.insertarNodo(new nodo
             {
                 transactionID = transactionID,
