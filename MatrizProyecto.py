@@ -80,6 +80,7 @@ class Matriz:
 		self.catalogo = ActivoCatalogo("Catalogo de productos", None, None, None, None, None)
 		self.transacciones = Transaccion("Transacciones", None, None, None, None, None, None)
 	def vacia(self): 
+		a = ""
 		if self.primeraEmpresa == None:
 			return True
 		else:
@@ -184,6 +185,11 @@ class Matriz:
 				s = "Insertado a la derecha de: " + raiz.idActivo
 		return s 
 	def graphMatriz(self):
+		s = ""
+		if self.primeraEmpresa != None:
+			s = self.graphMatriz2()
+		return s  
+	def graphMatriz2(self):
 		dot = Digraph(comment = 'GraficaLista')
 		dot
 		#Empresas--------------------------------------------------------------------------------------
@@ -297,18 +303,19 @@ class Matriz:
 		dot.render('c:/graficas/MatrizDispersa.dot', view=False)
 		return "Graficado"
 	def recorrerArbol(self, raiz, a):#(Pre-Orden)
-		a = "Nodo:\nId: " + raiz.idActivo + "\nNombre: " + raiz.nombreActivo + "\nDescripción: " + raiz.descripcionActivo + "\nEstado: " + raiz.estado + "\n"
-		n = Nodo(raiz, None, None, None)
-		if self.listaUsuario.primero == None:
-			self.listaUsuario.primero = n
-			self.listaUsuario.ultimo = n
-		else:
-			self.listaUsuario.ultimo.siguiente = n
-			self.listaUsuario.ultimo = n
-		if raiz.hijoizquierdo != None:
-			a = a + self.rIzquierda(raiz.hijoizquierdo, a)
-		if raiz.hijoderecho != None:
-			a = a + self.rDerecha(raiz.hijoderecho, a)
+		if raiz != None:
+			a = "Nodo:\nId: " + raiz.idActivo + "\nNombre: " + raiz.nombreActivo + "\nDescripción: " + raiz.descripcionActivo + "\nEstado: " + raiz.estado + "\n"
+			n = Nodo(raiz, None, None, None)
+			if self.listaUsuario.primero == None:
+				self.listaUsuario.primero = n
+				self.listaUsuario.ultimo = n
+			else:
+				self.listaUsuario.ultimo.siguiente = n
+				self.listaUsuario.ultimo = n
+			if raiz and raiz.hijoizquierdo != None:
+				a = a + self.rIzquierda(raiz.hijoizquierdo, a)
+			if raiz and raiz.hijoderecho != None:
+				a = a + self.rDerecha(raiz.hijoderecho, a)
 		return a
 	def devolverObjetos(self):
 		respuesta = "{\n\"activos\":[\n"
@@ -812,7 +819,8 @@ class Matriz:
 						#Temp3 para el departamento
 						temp4 = temp2
 						while temp4 != None:
-							s = self.recCatalogo(temp4.raiz, temp.contenido.nombreEmpresa, temp3.contenido.nombreDepartamento, temp4.contenido.nombreUsuario)
+							if temp4.raiz != None:
+								s = self.recCatalogo(temp4.raiz, temp.contenido.nombreEmpresa, temp3.contenido.nombreDepartamento, temp4.contenido.nombreUsuario)
 							temp4 = temp4.atras
 					temp3 = temp3.anterior
 				temp2 = temp2.abajo
@@ -860,9 +868,9 @@ class Matriz:
 		else:
 			self.catalogo.ultimo.siguiente = nodo
 			self.catalogo.ultimo = nodo
-		if raiz.hijoizquierdo != None:
+		if raiz and raiz.hijoizquierdo != None:
 			a = a + self.rIzquierdaCatalogo(raiz.hijoizquierdo, empresa, departamento, usuario)
-		if raiz.hijoderecho != None:
+		if raiz and raiz.hijoderecho != None:
 			a = a + self.rDerechaCatalogo(raiz.hijoderecho, empresa, departamento, usuario)
 		return a
 	def renta(self, idRenta, usuario, empresa, departamento, tiempo):
@@ -915,14 +923,26 @@ class Matriz:
 				temp = temp.siguiente
 		s = s + "]\n}"
 		return s
+	def devolverRentasInterface(self, empresa, departamento, usuario):
+		s =""
+		if self.transacciones.primero == None:
+			s = "No hay rentas a nombre del usuario: " + str(usuario)
+		else:
+			temp = self.transacciones.primero
+			while temp != None:
+				if (str(temp.usuario) == str(usuario)) and (str(temp.departamento) == str(departamento)) and (str(temp.empresa) == str(empresa)):
+					s = s + "Renta: --> Id Activo: " + temp.idA + "\nInformación del usuario que renta: \nUsuario: " + str(temp.usuario) + "\nEmpresa: " + str(temp.empresa) + "  Departamento: " + str(temp.departamento)
+					s = s + "\nTiempo: " + str(temp.tiempo)+ "\n\n"
+				temp = temp.siguiente
+		return s 
 	def recRentas(self, raiz, idAc):
 		a = ""
 		if str(raiz.idActivo) == str(idAc):
 			raiz.estado = "N"
 		else:
-			if raiz.hijoizquierdo != None:
+			if raiz and raiz.hijoizquierdo != None:
 				a = self.rIz(raiz.hijoizquierdo, idAc)
-			if raiz.hijoderecho != None:
+			if raiz and raiz.hijoderecho != None:
 				a = self.rDe(raiz.hijoderecho, idAc)
 		return a
 	def rIz(self, raiz, idAc):
@@ -971,9 +991,9 @@ class Matriz:
 		if str(raiz.idActivo) == str(idAc):
 			raiz.estado = "D"
 		else:
-			if raiz.hijoizquierdo != None:
+			if raiz and raiz.hijoizquierdo != None:
 				a = self.recDev(raiz.hijoizquierdo, idAc)
-			if raiz.hijoderecho != None:
+			if raiz and raiz.hijoderecho != None:
 				a = self.recDev(raiz.hijoderecho, idAc)
 		return a
 	def devI(self, raiz, ida):
@@ -1006,8 +1026,9 @@ class Matriz:
 			while temp1 != None:
 				temp2 = temp1
 				while temp2 != None:
-					s = self.recMod(temp2.raiz, idAc, des)
-					ok = True
+					if temp2.raiz != None:
+						s = self.recMod(temp2.raiz, idAc, des)
+						ok = True
 					temp2 = temp2.atras
 				temp1 = temp1.abajo
 			temp = temp.siguiente
@@ -1019,9 +1040,9 @@ class Matriz:
 				raiz.descripcionActivo = des
 				a = "Ok"
 		else:
-			if raiz.hijoizquierdo != None:
+			if raiz and raiz.hijoizquierdo != None:
 				a = self.recModIz(raiz.hijoizquierdo, idAc, des)
-			if raiz.hijoderecho != None:
+			if raiz and raiz.hijoderecho != None:
 				a = self.recModDe(raiz.hijoderecho, idAc, des)
 		return a
 	def recModIz(self, raiz, idAc, des):
@@ -1065,8 +1086,8 @@ class Matriz:
 				dot.edge(str(temp.contenido.idActivo), str(temp.siguiente.contenido.idActivo))
 				temp = temp.siguiente
 			dot.render('c:/graficas/ActivosEmpresa.dot', view=False)
+			lista.primero = None
 		return s 
-
 	def addListaEmpresa(self, raiz, lista):
 		nodoLista = Nodo(raiz, None, None, None)
 		if lista.primero == None:
@@ -1076,9 +1097,9 @@ class Matriz:
 			lista.ultimo.siguiente = nodoLista
 			nodoLista.anterior = lista.ultimo
 			lista.ultimo = nodoLista
-		if raiz.hijoizquierdo != None:
+		if raiz and raiz.hijoizquierdo != None:
 			self.addLI(raiz.hijoizquierdo, lista)
-		if raiz.hijoderecho != None:
+		if raiz and raiz.hijoderecho != None:
 			self.addLD(raiz.hijoderecho, lista)
 		return ""
 	def addLI(self, raiz, lista):
@@ -1089,9 +1110,197 @@ class Matriz:
 		s = ""
 		s = self.addListaEmpresa(raiz, lista)
 		return s 
+	def activosDepartamento(self, departamento):
+		s = ""
+		dot = Digraph(comment = 'GraficaLista')
+		dot
+		lista = Nodo("Lista de activos por departamento", None, None, None)
+		if self.primerDepartamento != None:
+			temp = self.primerDepartamento
+			while temp != None:
+				if str(departamento) == str(temp.contenido.nombreDepartamento):
+					temp1 = temp.primero
+					while temp1 != None:
+						temp2 = temp1
+						while temp2 != None:
+							s = self.addListaDepartamento(temp2.raiz, lista)
+							temp2 = temp2.atras
+						temp1 = temp1.siguiente
+					break
+				temp = temp.abajo
+
+		if lista.primero != None:
+			s = "Departamento: " + str(departamento) + "\n"
+			temp = lista.primero
+			while temp != None:
+				s = s + "\nId: " + temp.contenido.idActivo + " Nombre: " + temp.contenido.nombreActivo + " Estado: " + temp.contenido.estado
+				temp = temp.siguiente
+			temp = lista.primero
+			dot.node(str(temp.contenido.idActivo))
+			while temp.siguiente != None:
+				dot.node(str(temp.contenido.idActivo))
+				dot.node(str(temp.siguiente.contenido.idActivo))
+				dot.edge(str(temp.contenido.idActivo), str(temp.siguiente.contenido.idActivo))
+				temp = temp.siguiente
+			dot.render('c:/graficas/ActivosDepartamento.dot', view=False)
+			lista.primero = None
+		return s 
+	def addListaDepartamento(self, raiz, lista):
+		nodoLista = Nodo(raiz, None, None, None)
+		if lista.primero == None:
+			lista.primero = nodoLista
+			lista.ultimo = nodoLista
+		else:
+			lista.ultimo.siguiente = nodoLista
+			nodoLista.anterior = lista.ultimo
+			lista.ultimo = nodoLista
+		if raiz and raiz.hijoizquierdo != None:
+			self.addLID(raiz.hijoizquierdo, lista)
+		if raiz and raiz.hijoderecho != None:
+			self.addLDD(raiz.hijoderecho, lista)
+		return ""
+	def addLID(self, raiz, lista):
+		s = ""
+		s = self.addListaDepartamento(raiz, lista)
+		return s
+	def addLDD(self, raiz, lista):
+		s = ""
+		s = self.addListaDepartamento(raiz, lista)
+		return s 
+	def verEmpresas(self):
+		s = ""
+		if self.primeraEmpresa == None:
+			s = "No hay empresas"
+		else:
+			temp = self.primeraEmpresa
+			while temp != None:
+				s = s + temp.contenido.nombreEmpresa + "$"
+				temp = temp.siguiente
+		return s 
+	def verDepartamentos(self, empresa):
+		s = ""
+		if self.primeraEmpresa == None:
+			s = "No hay departamentos"
+		else:
+			temp = self.primeraEmpresa
+			while temp != None:
+				if str(temp.contenido.nombreEmpresa) == str(empresa):
+					temp1 = temp.primero
+					while temp1 != None:
+						temp2 = temp1
+						while temp2 != None:
+							if temp2.anterior == None:
+								s = s + temp2.contenido.nombreDepartamento + "$"
+							temp2 = temp2.anterior 
+						temp1 = temp1.abajo
+				temp = temp.siguiente
+		return s
+	def verUsuarios(self, departamento, empresa):
+		s = ""
+		if self.primeraEmpresa == None:
+			s = "No hay usuarios"
+		else:
+			temp = self.primeraEmpresa
+			while temp != None:
+				if str(temp.contenido.nombreEmpresa) == str(empresa):
+					temp1 = temp.primero
+					while temp1 != None:
+						temp2 = temp1
+						while temp2 != None:
+							if temp2.anterior == None:
+								if str(temp2.contenido.nombreDepartamento) == str(departamento):
+									temp3 = temp1
+									while temp3 != None:
+										s = s + temp3.contenido.nombreUsuario + "$"
+										temp3 = temp3.atras
+							temp2 = temp2.anterior
+						temp1 = temp1.abajo
+				temp = temp.siguiente	
+		return s	
+	def graficarAvl(self, empresa, departamento, usuario):
+		s = ""
+		lista = Nodo("lista de nodos del arbol", None, None, None)
+		if self.primeraEmpresa == None:
+			s = "No hay datos"
+		else:
+			temp = self.primeraEmpresa
+			while temp != None:
+				if str(temp.contenido.nombreEmpresa) == str(empresa):
+					if temp.primero != None:
+						temp1 = temp.primero
+						while temp1 != None:
+							temp2 = temp1
+							while temp2 != None:
+								if temp2.anterior == None:
+									if str(temp2.contenido.nombreDepartamento) == str(departamento):
+										temp3 = temp1
+										while temp3 != None:
+											if str(temp3.contenido.nombreUsuario) == str(usuario):
+												s = self.avlUsuario(temp3.raiz, lista)
+											temp3 = temp3.atras
+								temp2 = temp2.anterior
+							temp1 = temp1.abajo
+				temp = temp.siguiente
+		if lista.primero == None:
+			s = "No hay datos"
+		else:
+			dot = Digraph(comment = 'GraficaLista')
+			dot
+			temp = lista.primero
+			while temp != None:
+				if temp and temp.contenido.raiz == None:
+					dot.node(str(temp.contenido.idActivo))
+				else:
+					dot.node(str(temp.contenido.raiz.idActivo))
+					dot.node(str(temp.contenido.idActivo))
+					dot.edge(str(temp.contenido.raiz.idActivo),str(temp.contenido.idActivo))
+				temp = temp.siguiente
+			dot.render('c:/graficas/Avl.dot', view=False)
+		return s
+	def avlUsuario(self, raiz, lista):
+		s = ""
+		nodoIngreso = Nodo(raiz, None, None, None)
+		if lista.primero == None:
+			lista.primero = nodoIngreso
+			lista.ultimo = nodoIngreso
+		else:
+			lista.ultimo.siguiente = nodoIngreso
+			nodoIngreso.anterior = lista.ultimo
+			lista.ultimo = nodoIngreso
+		if raiz and raiz.hijoizquierdo != None:
+			s = self.avlIz(raiz.hijoizquierdo, lista)
+		if raiz and raiz.hijoderecho != None:
+			s = self.avlDe(raiz.hijoderecho, lista)
+		return s 
+	def avlIz(self, raiz, lista):
+		s = ""
+		s = self.avlUsuario(raiz, lista)
+		return s
+	def avlDe(self, raiz, lista):
+		s = ""
+		s = self.avlUsuario(raiz, lista)
+		return s
+
+
 m = Matriz()
 
 #Metodos---------------------------------------------
+@app.route('/grafAvl', methods=['POST'])
+def grafAvl():
+	s = ""
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	userTemp = str(request.form['usuario'])
+	s = m.graficarAvl(empresaTemp, departamentoTemp, userTemp)
+	return s 
+@app.route('/devRentasUsuario', methods=['POST'])
+def devRentasUsuario():
+	s = ""
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	userTemp = str(request.form['usuario'])
+	s = m.devolverRentasInterface(empresaTemp, departamentoTemp, userTemp)
+	return s 
 @app.route('/addActivo',methods=['POST']) 
 def addActivo():
 	empresaTemp= str(request.form['empresa'])
@@ -1101,13 +1310,11 @@ def addActivo():
 	nombreActivoTemp = str(request.form['nombreActivo'])
 	descripcionActivoTemp = str(request.form['descripcionActivo'])
 	return m.addNodoArbol(userTemp, passTemp, departamentoTemp, empresaTemp, nombreActivoTemp, descripcionActivoTemp)
-
 @app.route('/random', methods=['POST'])
 def random():
 	s = ""
 	s = m.randomM()
 	return s
-
 @app.route('/addMatrizDispersa',methods=['POST']) 
 def addMatrizDispersa():
 	empresaTemp= str(request.form['empresa'])
@@ -1116,7 +1323,6 @@ def addMatrizDispersa():
 	userTemp = str(request.form['user'])
 	passTemp = str(request.form['password'])
 	return m.verificarUsuario(empresaTemp, departamentoTemp, nombreTemp, userTemp, passTemp)
-
 @app.route('/Login',methods=['POST']) 
 def Login():
 	empresaTemp= str(request.form['empresa'])
@@ -1124,7 +1330,6 @@ def Login():
 	userTemp = str(request.form['user'])
 	passTemp = str(request.form['password'])
 	return m.Login(userTemp, passTemp, empresaTemp, departamentoTemp)
-
 @app.route('/renta',methods=['POST']) 
 def Renta():
 	empresaTemp= str(request.form['empresa'])
@@ -1136,12 +1341,10 @@ def Renta():
 	s = m.renta(idTemp, userTemp, empresaTemp, departamentoTemp, tiempoTemp)
 	s = s + m.devolverRentas()
 	return s
-
 @app.route('/graficarMatriz', methods=['POST'])
 def graficarMatriz():
 	v = m.graphMatriz()
 	return v
-
 @app.route('/vista', methods=['POST'])
 def vista():
 	empresaTemp= str(request.form['empresa'])
@@ -1149,20 +1352,17 @@ def vista():
 	userTemp = str(request.form['user'])
 	passTemp = str(request.form['password'])
 	return m.vista(userTemp, passTemp, empresaTemp, departamentoTemp)
-
 @app.route('/catalogo', methods=['POST'])
 def catalogo():
 	s = ""
 	s = m.devolverCatalogo()
 	return s
-
 @app.route('/devolucion', methods=['POST'])
 def devolucion():
 	s = ""
 	idTemp= str(request.form['id'])
 	s = m.devolucion(idTemp)
 	return s
-
 @app.route('/modificar', methods=['POST'])
 def modificar():
 	s = ""
@@ -1176,10 +1376,34 @@ def activosEmpresa():
 	empresaTemp= str(request.form['empresa'])
 	s = m.activosEmpresa(empresaTemp)
 	return s
+@app.route('/activosDepartamento', methods=['POST'])
+def activosDepartamento():
+	s = ""
+	dTemp= str(request.form['departamento'])
+	s = m.activosDepartamento(dTemp)
+	return s
 @app.route('/recorrerMatriz', methods=['POST'])
 def recorrerMatriz():
 	s = ""
 	s = m.recorrerMatriz()
+	return s 
+@app.route('/verEmpresas', methods=['POST'])
+def verEmpresas():
+	s = ""
+	s = m.verEmpresas()
+	return s 
+@app.route('/verDepartamentos', methods=['POST'])
+def verDepartamentos():
+	s = ""
+	empresaTemp= str(request.form['empresa'])
+	s = m.verDepartamentos(empresaTemp)
+	return s
+@app.route('/verUsuarios', methods=['POST'])
+def verUsuarios():
+	s = ""
+	empresaTemp= str(request.form['empresa'])
+	departamentoTemp = str(request.form['departamento'])
+	s = m.verUsuarios(departamentoTemp, empresaTemp)
 	return s 
 	
 if __name__ == "__main__":
