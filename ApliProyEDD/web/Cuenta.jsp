@@ -62,7 +62,7 @@ padding: 7px 9px;
     
  
 
-  <%out.println("<h1>"+session.getAttribute("inputUsuario")+"</h1>");%>
+  <%out.println("<h1>"+"BIENVENIDO USUARIO:"+session.getAttribute("inputUsuario")+"</h1>");%>
 
 
 
@@ -83,7 +83,7 @@ padding: 7px 9px;
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Proyecto 1</a>
+          <a class="navbar-brand" href="#"><%out.println("USUARIO:"+session.getAttribute("inputUsuario"));%></a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">

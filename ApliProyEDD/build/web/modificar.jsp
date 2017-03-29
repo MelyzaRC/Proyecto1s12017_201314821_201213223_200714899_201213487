@@ -176,7 +176,7 @@ padding: 7px 9px;
 
       <form role="form"  >
         <div class="form-group">
-            <span id="nombreActivo" class="form-control"></span>
+            <span id="nombreActivo" class="form-control" disabled="disabled"></span>
             <br><br>
           <textarea id="descripcionActivo" name="descripcionActivo" class="form-control" rows="3"></textarea>
         </div>
@@ -213,7 +213,7 @@ padding: 7px 9px;
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Proyecto 1</a>
+          <a class="navbar-brand" href="#"><%out.println("USUARIO:"+session.getAttribute("inputUsuario"));%></a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">

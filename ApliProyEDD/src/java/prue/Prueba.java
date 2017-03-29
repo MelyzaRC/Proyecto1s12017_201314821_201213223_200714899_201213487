@@ -104,7 +104,7 @@ try {
                 
                 .build();
 try {
-            URL url = new URL("http://192.168.43.223:5000/vista");
+            URL url = new URL("http://192.168.43.223:5000/vista");//IP 192.168.43.223
             Request request = new Request.Builder().url(url).post(formBody).build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
@@ -125,7 +125,7 @@ try {
                 
                 .build();
         try {
-            URL url = new URL("http://192.168.43.223:5000/modificar");
+            URL url = new URL("http://192.168.43.223:5000/modificar");//IP 192.168.43.223
             Request request = new Request.Builder().url(url).post(formBody).build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
@@ -142,7 +142,7 @@ try {
             public static String Eliminar(String id){
                 
         try {
-            URL url = new URL("http://192.168.43.81/webapi/api/ArbolB/eliminarActivo?assetID="+id);
+            URL url = new URL("http://192.168.43.81/webapi/api/ArbolB/eliminarActivo?assetID="+id);//IP 192.168.43.81
             Request request = new Request.Builder().url(url).get().build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
