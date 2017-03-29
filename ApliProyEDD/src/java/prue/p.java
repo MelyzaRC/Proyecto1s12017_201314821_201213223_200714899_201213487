@@ -58,6 +58,9 @@ public class p extends HttpServlet {
           session.setAttribute("txtjson",devolver);
             System.out.println("c"+devolver);
           response.sendRedirect("eliminar.jsp");
+          
+         
+          
           /*Json json = new Json();
           json.metodo((String) session.getAttribute("txtjson"));
            */

@@ -10,6 +10,8 @@
 <%@page import="org.json.simple.parser.JSONParser"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="prue.Activo"%>
+<%@page import="prue.Prueba"%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -24,15 +26,16 @@
   <script type="text/javascript">
       $(document).ready(function(){
           $("#eliminar-btn").click(function(){
-              var idsel = $('#idSeleccionado').val();
-              $.get('http://localhost:55607/api/ArbolB/eliminar',{assetID:idsel})
+              var indexsel = $('#combo').val();
+              var idsel = $('#val_'+indexsel).val();
+              $.get('http://192.168.43.81/webapi/api/ArbolB/eliminarActivo',{assetID:idsel})
           });
       })
       
   </script>
-  
- 
- 
+ <script type="text/javascript"> 
+ $variable = $_POST['combo'];
+  </script>
   
   
     <!-- Bootstrap -->
@@ -78,94 +81,113 @@ padding: 7px 9px;
 }
 </style>
 
-      
-      <form class="form-eliminar" method="post" action="p">
+<%
+    ArrayList<Activo> lista = new ArrayList<Activo>();
+    try{
+        String inputUsuario, inputContrasena,inputDepartamento,inputEmpresa;
+        inputUsuario = (String)session.getAttribute("inputUsuario");
+        inputDepartamento = (String)session.getAttribute("inputDepartamento");
+        inputEmpresa = (String)session.getAttribute("inputEmpresa");
+        inputContrasena = (String)session.getAttribute("inputContrasena");
+
+        String devolver = Prueba.Devolver(inputUsuario, inputDepartamento, inputEmpresa, inputContrasena);
+        JSONParser parser = new JSONParser();
+
+        if(!devolver.isEmpty()){
+            lista = new ArrayList<Activo>();
+            Object obj = parser.parse(devolver);//(String)session.getAttribute("txtjson"));
+            JSONObject jsonObject =(JSONObject) obj;
+
+            JSONArray tag = (JSONArray) jsonObject.get("activos");
+            for(int i=0; i<tag.size();i++){
+                JSONObject tagi = (JSONObject) tag.get(i);
+                String id = (String)tagi.get("id");
+
+                String nombre = (String) tagi.get("nombre");
+
+                String descripcion = (String) tagi.get("descripcion");
+
+                String estado = (String) tagi.get("estado");
+
+
+
+                System.out.println("id:"+id);
+                System.out.println("nombre:"+nombre);
+                System.out.println("descripcion:"+descripcion);
+                System.out.println("estado:"+estado);
+
+                Activo act = new Activo(descripcion, id, nombre, estado);
+                lista.add(act);
+                
+            }
+            System.out.println("listaid:"+lista);
+            session.setAttribute("lista", lista);
+            
+        }
+    } catch(Exception ex){
+        
+    }
+ %>     
+      <form class="form-eliminar" method="post" action="eliminar">
           <h2 class="form-eliminar-heading">Eliminar Activos</h2>
           <br><br>
           
-      <%   ArrayList<String> lista = new ArrayList<String>();
-           ArrayList<String>listas = new ArrayList<String>();
-JSONParser parser = new JSONParser();
-          try{
-              Object obj = parser.parse((String)session.getAttribute("txtjson"));
-              JSONObject jsonObject =(JSONObject) obj;
-       
-             /* String id = (String) jsonObject.get("id");
-              System.out.println("i:"+id);
-              String nombre = (String) jsonObject.get("nombre");
-              System.out.println("n:"+nombre);
-            */
-              
-            
-              JSONArray tag = (JSONArray) jsonObject.get("Activos");
-             for(int i=0; i<tag.size();i++){
-                 JSONObject tagi = (JSONObject) tag.get(i);
-                 String id = (String)tagi.get("id");
-                 
-                 String nombre = (String) tagi.get("nombre");
-                
-                 String descripcion = (String) tagi.get("descripcion");
-                 
-                 String estado = (String) tagi.get("estado");
-                
-                 System.out.println("id:"+id);
-                 System.out.println("nombre:"+nombre);
-                 System.out.println("descripcion:"+descripcion);
-                 System.out.println("estado:"+estado);
-                 
-           
-             lista.add(id);
-                 System.out.println("listaid:"+lista);
-                 
-                String deli = "[\\[\\],]+";
-             String[] idArray= lista.toString().split(deli);
-                  
-                  for (String idArray1 : idArray) {
-                      System.out.println(idArray1);
-             
-                      listas.add(idArray1);
-
-                    
-                   //   session.setAttribute("idArray1",idArray1);
-                  } 
-             
-             }
-          } catch (Exception ex) {
-               System.out.println("Error:"+ex.toString());
-          }
-                        
-%>
-
-       
-        <div class="dropdown">
-  <button class="btn btn-default dropdown-toggle" name="drop" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    Dropdown
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <% 
-       //List listas = new ArrayList();
-      // listas.add(session.getAttribute("idArray1"));
-       for(int i=0; i<listas.size();i++){
+<% 
+       for(int i=0; i<lista.size();i++){
    
-          out.println("<li><a>"+listas.get(i)+"</a></li>");
+          out.println("<input type='hidden' name='val_"+i+"' id='val_"+i+"' value='"+lista.get(i).getId()+"' />");
        }
-   %>   
+   %> 
+       
+<select name="combo" ID="combo" onchange=""> 
+    <% 
+       for(int i=0; i<lista.size();i++){
    
+          out.println("<option value='"+i+"'>"+lista.get(i).getId()+"</option>");
+       }
+   %>  
+
+           
    
-  
+ 
+</select>
+   <head>
+   <script type="text/javascript">
+       $('#combo').change(function() {
+            opt = $(this).val();
+            <% 
+                
+                for(int i=0; i<lista.size();i++){
+                    if(i!=0){
+                        out.println("else ");
+                    }
+                    out.println("if (opt=='"+i+"') { $('#descripcionActivo').val('"+lista.get(i).getDescripcion()+"'); $('#nombreActivo').html('"+lista.get(i).getNombre()+"'); }");
+                }
+            %>
+        });
+   
+   </script>
+   </head>
+ 
+ 
        
         
    
   </ul>
 </div>
         
-        
+    
       
  <br><br><br><br>
+ 
+ 
+ 
+
       <form role="form"  >
         <div class="form-group">
-          <textarea class="form-control" rows="3"></textarea>
+            <span id="nombreActivo" class="form-control"></span>
+            <br><br>
+          <textarea id="descripcionActivo" class="form-control" rows="3"></textarea>
         </div>
           <br>
           
@@ -173,9 +195,11 @@ JSONParser parser = new JSONParser();
           
          
         <input class="btn btn-success" id="eliminar-btn" type="submit">
-      </form>
+         <br><br>
+         
+              
       <br><br>
-
+   
 
 
 

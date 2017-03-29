@@ -3,6 +3,13 @@ package org.apache.jsp;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import java.util.List;
+import java.util.ArrayList;
+import prue.Activo;
+import prue.Prueba;
 
 public final class eliminar_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
@@ -44,6 +51,15 @@ public final class eliminar_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("\n");
       out.write("\n");
       out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
       out.write("<!DOCTYPE html>\n");
       out.write("<html lang=\"en\">\n");
       out.write("  <head>\n");
@@ -60,7 +76,13 @@ public final class eliminar_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("              $.get('http://localhost:55607/api/ArbolB/eliminar',{assetID:idsel})\n");
       out.write("          });\n");
       out.write("      })\n");
+      out.write("      \n");
       out.write("  </script>\n");
+      out.write(" <script type=\"text/javascript\"> \n");
+      out.write(" $variable = $_POST['combo'];\n");
+      out.write("  </script>\n");
+      out.write("  \n");
+      out.write("  \n");
       out.write("    <!-- Bootstrap -->\n");
       out.write("    <link href=\"./bootstrapp/css/bootstrap.min.css\" rel=\"stylesheet\">\n");
       out.write("\n");
@@ -103,46 +125,133 @@ public final class eliminar_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("padding: 7px 9px;\n");
       out.write("}\n");
       out.write("</style>\n");
-      out.write("      ");
-session.getAttribute("inputUsuario");
-session.getAttribute("inputEmpresa");
-session.getAttribute("inputContrasena");
-session.getAttribute("inputDepartamento");
-session.getAttribute("id");
-session.getAttribute("nombreProducto");
-session.getAttribute("desActivo");
-
-
       out.write("\n");
-      out.write("      <form class=\"form-eliminar\">\n");
+
+    ArrayList<Activo> lista = new ArrayList<Activo>();
+    try{
+        String inputUsuario, inputContrasena,inputDepartamento,inputEmpresa;
+        inputUsuario = (String)session.getAttribute("inputUsuario");
+        inputDepartamento = (String)session.getAttribute("inputDepartamento");
+        inputEmpresa = (String)session.getAttribute("inputEmpresa");
+        inputContrasena = (String)session.getAttribute("inputContrasena");
+
+        String devolver = Prueba.Devolver(inputUsuario, inputDepartamento, inputEmpresa, inputContrasena);
+        JSONParser parser = new JSONParser();
+
+        if(!devolver.isEmpty()){
+            lista = new ArrayList<Activo>();
+            Object obj = parser.parse(devolver);//(String)session.getAttribute("txtjson"));
+            JSONObject jsonObject =(JSONObject) obj;
+
+            JSONArray tag = (JSONArray) jsonObject.get("activos");
+            for(int i=0; i<tag.size();i++){
+                JSONObject tagi = (JSONObject) tag.get(i);
+                String id = (String)tagi.get("id");
+
+                String nombre = (String) tagi.get("nombre");
+
+                String descripcion = (String) tagi.get("descripcion");
+
+                String estado = (String) tagi.get("estado");
+
+
+
+                System.out.println("id:"+id);
+                System.out.println("nombre:"+nombre);
+                System.out.println("descripcion:"+descripcion);
+                System.out.println("estado:"+estado);
+
+                Activo act = new Activo(descripcion, id, nombre, estado);
+                lista.add(act);
+                
+            }
+            System.out.println("listaid:"+lista);
+            session.setAttribute("lista", lista);
+            
+        }
+    } catch(Exception ex){
+        
+    }
+ 
+      out.write("     \n");
+      out.write("      <form class=\"form-eliminar\" method=\"post\" action=\"p\">\n");
       out.write("          <h2 class=\"form-eliminar-heading\">Eliminar Activos</h2>\n");
       out.write("          <br><br>\n");
-      out.write(" <div class=\"dropdown\">\n");
-      out.write("  <button class=\"btn btn-primary dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\">Id Producto\n");
-      out.write("  <span class=\"caret\"></span></button>\n");
-      out.write("  <ul class=\"dropdown-menu\">\n");
-      out.write("    <li>1</li>\n");
-      out.write("    <li>2</li>\n");
-      out.write("    <li>3</li>\n");
+      out.write("          \n");
+      out.write("\n");
+      out.write("       \n");
+      out.write("<select name=\"combo\" ID=\"combo\" onchange=\"\"> \n");
+      out.write("    ");
+ 
+       for(int i=0; i<lista.size();i++){
+   
+          out.println("<option value='"+i+"'>"+lista.get(i).getId()+"</option>");
+       }
+   
+      out.write("  \n");
+      out.write("\n");
+      out.write("           \n");
+      out.write("   \n");
+      out.write(" \n");
+      out.write("</select>\n");
+      out.write("   <head>\n");
+      out.write("   <script type=\"text/javascript\">\n");
+      out.write("       $('#combo').change(function() {\n");
+      out.write("            opt = $(this).val();\n");
+      out.write("            ");
+ 
+                
+                for(int i=0; i<lista.size();i++){
+                    if(i!=0){
+                        out.println("else ");
+                    }
+                    out.println("if (opt=='"+i+"') { $('#descripcionActivo').val('"+lista.get(i).getDescripcion()+"'); $('#nombreActivo').val('"+lista.get(i).getNombre()+"'); }");
+                }
+            
+      out.write("\n");
+      out.write("        });\n");
+      out.write("   \n");
+      out.write("   </script>\n");
+      out.write("   </head>\n");
+      out.write(" \n");
+      out.write(" \n");
+      out.write("       \n");
+      out.write("        \n");
+      out.write("   \n");
       out.write("  </ul>\n");
       out.write("</div>\n");
-      out.write("  <br><br>\n");
-      out.write("   \n");
-      out.write("        <label for=\"NombreProducto\" class=\"sr-only\">Nombre Producto</label>\n");
-      out.write("        <input type=\"nombreProducto\" id=\"NombreProducto\" class=\"form-control\"/>\n");
+      out.write("        \n");
+      out.write("    \n");
       out.write("      \n");
       out.write(" <br><br><br><br>\n");
-      out.write("      <form role=\"form\">\n");
+      out.write(" \n");
+      out.write(" \n");
+      out.write(" \n");
+      out.write("\n");
+      out.write("      <form role=\"form\"  >\n");
       out.write("        <div class=\"form-group\">\n");
-      out.write("          <textarea class=\"form-control\" rows=\"3\"></textarea>\n");
+      out.write("            <span id=\"nombreActivo\" class=\"form-control label\"></span>\n");
+      out.write("          <textarea id=\"descripcionActivo\" class=\"form-control\" rows=\"3\"></textarea>\n");
       out.write("        </div>\n");
       out.write("          <br>\n");
-      out.write("          <input type=\"hidden\" id=\"idSeleccionado\" value=\"activo1\" />\n");
-      out.write("        <span class=\"btn btn-success\" id=\"eliminar-btn\">Eliminar Activo</span>\n");
+      out.write("          \n");
+      out.write("    \n");
+      out.write("          \n");
+      out.write("         \n");
+      out.write("        <input class=\"btn btn-success\" id=\"eliminar-btn\" type=\"submit\">\n");
+      out.write("         <br><br>\n");
+      out.write("         \n");
+      out.write("              <form class=\"form-eliminar\" method=\"post\" action=\"#\">\n");
+      out.write("             \n");
+      out.write("             <script>\n");
+      out.write("           \n");
+      out.write("} \n");
+      out.write("             </script>\n");
+      out.write("            <input class=\"btn btn-success\" id=\"cargardatos-btn\" type=\"submit\">\n");
+      out.write("              </form>\n");
       out.write("      </form>\n");
       out.write("      <br><br>\n");
-      out.write("\n");
-      out.write("\n");
+      out.write("   \n");
       out.write("\n");
       out.write("\n");
       out.write("\n");
@@ -150,6 +259,19 @@ session.getAttribute("desActivo");
       out.write("\n");
       out.write("\n");
       out.write("  </head>\n");
+session.getAttribute("inputUsuario");
+session.getAttribute("inputEmpresa");
+session.getAttribute("inputContrasena");
+session.getAttribute("inputDepartamento");
+
+
+
+
+
+
+
+      out.write("\n");
+      out.write("\n");
       out.write("\n");
       out.write("  <body>\n");
       out.write("   \n");

@@ -1,8 +1,17 @@
 <%-- 
-    Document   : modificar.jsp
-    Created on : 15-mar-2017, 21:29:49
+    Document   : eliminar.jsp
+    Created on : 15-mar-2017, 20:57:51
     Author     : Astrid Hernandez
 --%>
+
+
+<%@page import="org.json.simple.JSONArray"%>
+<%@page import="org.json.simple.JSONObject"%>
+<%@page import="org.json.simple.parser.JSONParser"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="prue.Activo"%>
+<%@page import="prue.Prueba"%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -13,7 +22,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Proyecto 1</title>
+  <script type="text/javascript" src="./js/jquery.min.js"></script>
 
+ <script type="text/javascript"> 
+ $variable = $_POST['combo'];
+  </script>
+  
+  
     <!-- Bootstrap -->
     <link href="./bootstrapp/css/bootstrap.min.css" rel="stylesheet">
 
@@ -56,35 +71,126 @@ margin-bottom: 15px;
 padding: 7px 9px;
 }
 </style>
-    
-      <form class="form-eliminar">
-          <h2 class="form-eliminar-heading">Modificar Descripcion de Activos</h2>
+
+<%
+    ArrayList<Activo> lista = new ArrayList<Activo>();
+    try{
+        String inputUsuario, inputContrasena,inputDepartamento,inputEmpresa;
+        inputUsuario = (String)session.getAttribute("inputUsuario");
+        inputDepartamento = (String)session.getAttribute("inputDepartamento");
+        inputEmpresa = (String)session.getAttribute("inputEmpresa");
+        inputContrasena = (String)session.getAttribute("inputContrasena");
+
+        String devolver = Prueba.Devolver(inputUsuario, inputDepartamento, inputEmpresa, inputContrasena);
+        JSONParser parser = new JSONParser();
+
+        if(!devolver.isEmpty()){
+            lista = new ArrayList<Activo>();
+            Object obj = parser.parse(devolver);//(String)session.getAttribute("txtjson"));
+            JSONObject jsonObject =(JSONObject) obj;
+
+            JSONArray tag = (JSONArray) jsonObject.get("activos");
+            for(int i=0; i<tag.size();i++){
+                JSONObject tagi = (JSONObject) tag.get(i);
+                String id = (String)tagi.get("id");
+
+                String nombre = (String) tagi.get("nombre");
+
+                String descripcion = (String) tagi.get("descripcion");
+
+                String estado = (String) tagi.get("estado");
+
+
+
+                System.out.println("id:"+id);
+                System.out.println("nombre:"+nombre);
+                System.out.println("descripcion:"+descripcion);
+                System.out.println("estado:"+estado);
+
+                Activo act = new Activo(descripcion, id, nombre, estado);
+                lista.add(act);
+                
+            }
+            System.out.println("listaid:"+lista);
+            session.setAttribute("lista", lista);
+            
+        }
+    } catch(Exception ex){
+        
+    }
+ %>     
+      <form class="form-eliminar" method="post" action="modificar">
+          <h2 class="form-eliminar-heading">Modificar Activos</h2>
           <br><br>
- <div class="dropdown">
-  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Id Producto
-  <span class="caret"></span></button>
-  <ul class="dropdown-menu">
-    <li><a href="#">1</a></li>
-    <li><a href="#">2</a></li>
-    <li><a href="#">3</a></li>
+          
+<% 
+       for(int i=0; i<lista.size();i++){
+   
+          out.println("<input type='hidden' name='val_"+i+"' id='val_"+i+"' value='"+lista.get(i).getId()+"' />");
+       }
+   %> 
+       
+<select name="combo" ID="combo" onchange=""> 
+    <% 
+       for(int i=0; i<lista.size();i++){
+   
+          out.println("<option value='"+i+"'>"+lista.get(i).getId()+"</option>");
+       }
+   %>  
+
+           
+   
+ 
+</select>
+   <head>
+   <script type="text/javascript">
+       $('#combo').change(function() {
+            opt = $(this).val();
+            <% 
+                
+                for(int i=0; i<lista.size();i++){
+                    if(i!=0){
+                        out.println("else ");
+                    }
+                    out.println("if (opt=='"+i+"') { $('#descripcionActivo').val('"+lista.get(i).getDescripcion()+"'); $('#nombreActivo').html('"+lista.get(i).getNombre()+"'); }");
+                }
+            %>
+        });
+   
+   </script>
+   </head>
+ 
+ 
+       
+        
+   
   </ul>
 </div>
-  <br><br>
-   
-        <label for="NombreProducto" class="sr-only">Nombre Producto</label>
-        <input type="nombreProducto" id="NombreProducto" class="form-control"/>
+        
+    
       
  <br><br><br><br>
-      <form role="form">
+ 
+ 
+ 
+
+      <form role="form"  >
         <div class="form-group">
-          <textarea class="form-control" rows="3"></textarea>
+            <span id="nombreActivo" class="form-control"></span>
+            <br><br>
+          <textarea id="descripcionActivo" name="descripcionActivo" class="form-control" rows="3"></textarea>
         </div>
           <br>
-        <button type="submit" class="btn btn-success">Modificar Descripción</button>
-      </form>
+          
+    
+          
+         
+        <input class="btn btn-success" id="eliminar-btn" type="submit">
+         <br><br>
+         
+              
       <br><br>
-
-
+   
 
 
 
@@ -92,6 +198,9 @@ padding: 7px 9px;
 
 
   </head>
+
+
+
   <body>
    
       

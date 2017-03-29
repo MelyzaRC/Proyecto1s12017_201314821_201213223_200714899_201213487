@@ -36,7 +36,7 @@ public class Prueba {
                 .build();
   
 try {
-            URL url = new URL("http://localhost:5000/addMatrizDispersa");
+            URL url = new URL("http://192.168.43.223:5000/addMatrizDispersa");
             Request request = new Request.Builder().url(url).post(formBody).build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
@@ -57,7 +57,7 @@ try {
                 
                 .build();
 try {
-            URL url = new URL("http://localhost:5000/Login");
+            URL url = new URL("http://192.168.43.223:5000/Login");
             Request request = new Request.Builder().url(url).post(formBody).build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
@@ -81,7 +81,7 @@ try {
                 
                 .build();
 try {
-            URL url = new URL("http://localhost:5000/addActivo");
+            URL url = new URL("http://192.168.43.223:5000/addActivo");
             Request request = new Request.Builder().url(url).post(formBody).build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
@@ -104,7 +104,7 @@ try {
                 
                 .build();
 try {
-            URL url = new URL("http://localhost:5000/devolverElementos");
+            URL url = new URL("http://192.168.43.223:5000/vista");
             Request request = new Request.Builder().url(url).post(formBody).build();
             Response response = webClient.newCall(request).execute();
             String response_string = response.body().string();
@@ -116,6 +116,44 @@ try {
         }
        return null;  
 }
+            public static String Modificar(String id, String nuevadescripcion){
+                RequestBody formBody = new FormEncodingBuilder()
+                .add("id", id)
+                .add("descripcion",nuevadescripcion)
+               
+              
+                
+                .build();
+        try {
+            URL url = new URL("http://192.168.43.223:5000/modificar");
+            Request request = new Request.Builder().url(url).post(formBody).build();
+            Response response = webClient.newCall(request).execute();
+            String response_string = response.body().string();
+            return response_string;
+        } catch (MalformedURLException ex) {
+            System.out.println(ex.toString());
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
+       return null;  
+            }
+            
+            
+            public static String Eliminar(String id){
+                
+        try {
+            URL url = new URL("http://192.168.43.81/webapi/api/ArbolB/eliminarActivo?assetID="+id);
+            Request request = new Request.Builder().url(url).get().build();
+            Response response = webClient.newCall(request).execute();
+            String response_string = response.body().string();
+            return response_string;
+        } catch (MalformedURLException ex) {
+            System.out.println(ex.toString());
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
+       return null;  
+            }
 }
     
 

@@ -20,6 +20,14 @@
         <servlet-name>p</servlet-name>
         <servlet-class>prue.p</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>modi</servlet-name>
+        <servlet-class>prue.modi</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>eliminar</servlet-name>
+        <servlet-class>prue.eliminar</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AgreUsu</servlet-name>
         <url-pattern>/AgreUsu</url-pattern>
@@ -39,6 +47,14 @@
     <servlet-mapping>
         <servlet-name>p</servlet-name>
         <url-pattern>/p</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>modi</servlet-name>
+        <url-pattern>/modi</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>eliminar</servlet-name>
+        <url-pattern>/eliminar</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
