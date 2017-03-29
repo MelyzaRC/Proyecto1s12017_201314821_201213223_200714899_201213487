@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.vania.app_edd.activity_menu">
+
+    <RelativeLayout
+        android:layout_width="401dp"
+        android:layout_height="640dp"
+        tools:layout_editor_absoluteX="5dp"
+        tools:layout_editor_absoluteY="-19dp">
+
+        <Button
+            android:id="@+id/btn_devolver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="156dp"
+            android:text="REGISTRAR DEVOLUCIÓN"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/label_user" />
+
+        <Button
+            android:id="@+id/button14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/btn_devolver"
+            android:layout_below="@+id/btn_devolver"
+            android:layout_marginEnd="22dp"
+            android:layout_marginTop="127dp"
+            android:text="CERRAR SESIÓN" />
+
+        <TextView
+            android:id="@+id/label_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/button14"
+            android:layout_marginBottom="67dp"
+            android:layout_marginStart="14dp"
+            android:layout_toEndOf="@+id/btn_ingresar"
+            android:text="TextView" />
+
+        <Button
+            android:id="@+id/btn_menu_rentar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/label_user"
+            android:layout_alignStart="@+id/button14"
+            android:layout_marginStart="10dp"
+            android:text="RENTAR" />
+
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>
