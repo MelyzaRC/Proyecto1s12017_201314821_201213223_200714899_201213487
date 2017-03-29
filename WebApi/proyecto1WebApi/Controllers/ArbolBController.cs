@@ -26,6 +26,10 @@ namespace proyecto1WebApi.Controllers
         [ActionName("dibujarArbol")]
         public string dibujarArbol()
         {
+            if (ArbolB.raiz == null)
+            {
+                return "Arbol Vacío";
+            }
             Pagina a = ArbolB.raiz;
             string javascript = "var simple_chart_config = { chart: { container: '#OrganiseChart-simple'	}, nodeStructure: {";
             javascript += arbol.dibujaArbol(a);
@@ -37,12 +41,17 @@ namespace proyecto1WebApi.Controllers
         [ActionName("graficarArbol")]
         public string graficarArbol()
         {
+            if (ArbolB.raiz == null)
+            {
+                return "graph { \" Arbol Vacío \"}";
+            }
+
             Pagina a = ArbolB.raiz;
             string javascript = "graph {";
             javascript += arbol.graficarArbol(a);
             javascript += "}";
 
-            string filePath = AppDomain.CurrentDomain.BaseDirectory + "imagenes\\archivo_dot.dot";
+            /*string filePath = AppDomain.CurrentDomain.BaseDirectory + "imagenes\\archivo_dot.dot";
 
             if (File.Exists(filePath))
                 File.Delete(filePath);
@@ -67,8 +76,8 @@ namespace proyecto1WebApi.Controllers
 
             proc.Start();
 
-            string result = proc.StandardOutput.ReadToEnd();
-            
+            string result = proc.StandardOutput.ReadToEnd();*/
+
 
             return javascript;
         }
@@ -85,7 +94,7 @@ namespace proyecto1WebApi.Controllers
         [ActionName("insertar")]
         public void insertar([FromUri]string userID, [FromUri]string departamento, [FromUri]string assetID, [FromUri]string empresa, [FromUri]string fecha, [FromUri]string diasRentados)
         {
-            
+
             string transactionID = Guid.NewGuid().ToString("N").Substring(0, 15);
             arbol.insertarNodo(new nodo
             {
@@ -116,11 +125,35 @@ namespace proyecto1WebApi.Controllers
         public void eliminarActivo([FromUri]string assetID)
         {
             Pagina raiz = ArbolB.raiz;
+            bool eliminado = false;
+            while(!eliminado)
+                arbol.eliminarActivo(ref raiz, assetID, ref eliminado);
 
-            arbol.eliminarActivo(ref raiz, assetID);
+
+            eliminado = false;
+            while (!eliminado)
+                arbol.eliminarActivo(ref raiz, assetID, ref eliminado);
 
             ArbolB.raiz = raiz;
 
         }
+        [HttpGet]
+        [ActionName("buscarNodo")]
+        public string buscarNodo([FromUri]string transactionID)
+        {
+            string returnresult = "";
+            Pagina raiz = ArbolB.raiz;
+            nodo result = arbol.buscarTransaccion(ref raiz, transactionID);
+
+            if(result != null)
+            {
+                returnresult = "graph { \"TransactionID: " + result.transactionID + ", assetID: " + result.assetID + ", userID: " + result.userID + ", departamento:" + result.departamento + ", empresa: " + result.empresa + ", dias rentados:" + result.diasRentados+"\" }";
+            } else
+            {
+                returnresult = "graph { \" No se encontró nodo \"}";
+            }
+            return returnresult;
+        }
+
     }
 }

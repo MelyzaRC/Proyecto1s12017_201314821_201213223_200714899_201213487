@@ -54,7 +54,7 @@ namespace proyecto1WebApi.Models
             else
             {
                 k = actual.cuenta;
-                while ((strcmp(cl.transactionID, actual.claves[k].transactionID) < 0) && (k > 1))
+                while (actual.claves[k].transactionID!=null && (strcmp(cl.transactionID, actual.claves[k].transactionID) < 0) && (k > 1))
                     (k)--;
 
                 encontrado = (strcmp(cl.transactionID, actual.claves[k].transactionID) == 0);
@@ -399,7 +399,7 @@ namespace proyecto1WebApi.Models
 
             for (int i = 0; i < 5; i++)
             {
-                res += pag.claves[i] == null ? " " : pag.claves[i].transactionID;
+                res += pag.claves[i] == null ? "     " : pag.claves[i].transactionID;
                 res += "|";
             }
             res += "\"";
@@ -417,22 +417,50 @@ namespace proyecto1WebApi.Models
         }
 
 
-        public void eliminarActivo (ref Pagina pag, string activo)
+        public void eliminarActivo (ref Pagina pag, string activo, ref bool eliminado)
         {
-            for(int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
             {
-                if (pag.claves[i].assetID.Equals(activo))
+                if (pag != null && pag.claves[i] != null && pag.claves[i].assetID.Equals(activo))
                 {
                     eliminar(ref pag, pag.claves[i]);
-                    Pagina p = ArbolB.raiz;
-                    eliminarActivo(ref p, activo);
-                    ArbolB.raiz = p;
-                }
-                if (pag.ramas[i] != null)
-                {
-                    eliminarActivo(ref pag.ramas[i], activo);
+                    eliminado = true;
                 }
             }
+            for (int i = 0; i < 5; i++)
+            {
+                if (pag != null && pag.ramas[i] != null)
+                {
+                    eliminarActivo(ref pag.ramas[i], activo, ref eliminado);
+                }
+            }
+
+        }
+
+        public nodo buscarTransaccion(ref Pagina raiz, string transactionID)
+        {
+            nodo temp = null;
+            for(int i=0; i<5; i++)
+            {
+                if(raiz.claves[i]!=null && raiz.claves[i].transactionID.Equals(transactionID)) {
+                    temp = raiz.claves[i];
+                    if (temp != null)
+                    {
+                        return temp;
+                    }
+                }
+
+                if (raiz.ramas[i] != null)
+                {
+                    temp = buscarTransaccion(ref raiz.ramas[i], transactionID);
+                    if (temp != null)
+                    {
+                        return temp;
+                    }
+                }
+            }
+
+            return temp;
         }
 
     }
